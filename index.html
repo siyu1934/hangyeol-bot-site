@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>한결봇 | Discord 서버 관리</title>
+  <meta name="description" content="깔끔하고 간편한 Discord 서버 관리 봇, 한결봇">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;
+      background:#080a12;color:#f7f8ff;line-height:1.6;overflow-x:hidden
+    }
+    a{text-decoration:none;color:inherit}
+    .bg{
+      position:fixed;inset:0;z-index:-2;
+      background:
+        radial-gradient(circle at 15% 10%,rgba(91,105,255,.28),transparent 34%),
+        radial-gradient(circle at 85% 25%,rgba(139,92,246,.18),transparent 30%),
+        linear-gradient(180deg,#0b1020 0%,#080a12 55%,#07080d 100%);
+    }
+    .orb{position:fixed;border-radius:50%;filter:blur(90px);opacity:.25;z-index:-1}
+    .orb.one{width:280px;height:280px;background:#5865f2;left:-100px;top:350px}
+    .orb.two{width:260px;height:260px;background:#8b5cf6;right:-100px;top:850px}
+    nav{
+      width:min(1120px,92%);margin:22px auto 0;padding:14px 18px;
+      display:flex;align-items:center;justify-content:space-between;
+      border:1px solid rgba(255,255,255,.09);border-radius:18px;
+      background:rgba(13,16,29,.68);backdrop-filter:blur(18px);
+      position:sticky;top:14px;z-index:10
+    }
+    .brand{display:flex;align-items:center;gap:11px;font-weight:800;font-size:18px}
+    .logo{
+      width:38px;height:38px;border-radius:12px;display:grid;place-items:center;
+      background:linear-gradient(135deg,#7180ff,#5865f2);box-shadow:0 8px 28px rgba(88,101,242,.35)
+    }
+    .navlinks{display:flex;gap:24px;color:#aeb5cb;font-size:14px}
+    .navlinks a:hover{color:#fff}
+    .navbtn{
+      padding:10px 16px;border-radius:12px;background:#5865f2;font-weight:700;font-size:14px;
+      box-shadow:0 8px 24px rgba(88,101,242,.25)
+    }
+    .hero{width:min(1120px,92%);margin:105px auto 90px;text-align:center}
+    .badge{
+      display:inline-flex;padding:8px 14px;border:1px solid rgba(125,139,255,.5);
+      border-radius:999px;color:#b9c2ff;background:rgba(88,101,242,.08);font-size:13px;font-weight:700
+    }
+    h1{font-size:clamp(58px,10vw,112px);letter-spacing:-.07em;line-height:.95;margin:24px 0 20px;
+      text-shadow:0 0 45px rgba(117,130,255,.25)}
+    .gradient{background:linear-gradient(90deg,#fff,#b9c3ff 55%,#8d9aff);
+      -webkit-background-clip:text;background-clip:text;color:transparent}
+    .hero p{max-width:650px;margin:auto;color:#9da6bf;font-size:18px}
+    .actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:32px}
+    .btn{padding:14px 22px;border-radius:14px;font-weight:800;border:1px solid rgba(255,255,255,.1)}
+    .primary{background:#5865f2;box-shadow:0 12px 35px rgba(88,101,242,.3)}
+    .secondary{background:rgba(255,255,255,.055);color:#dce1f2}
+    .btn:hover{transform:translateY(-2px);filter:brightness(1.08)}
+    .panel{
+      width:min(1000px,92%);margin:0 auto 110px;padding:32px;
+      border:1px solid rgba(255,255,255,.1);border-radius:28px;
+      background:rgba(16,20,35,.72);backdrop-filter:blur(18px);
+      box-shadow:0 25px 80px rgba(0,0,0,.3)
+    }
+    .paneltop{display:flex;align-items:center;gap:8px;margin-bottom:25px}
+    .dot{width:9px;height:9px;border-radius:50%;background:#5865f2}
+    .paneltop span{color:#7f89a3;font-size:13px}
+    .mock{
+      display:grid;grid-template-columns:170px 1fr;min-height:280px;
+      border:1px solid rgba(255,255,255,.07);border-radius:18px;overflow:hidden;background:#0b0e18
+    }
+    .side{padding:22px;background:#0e1220;border-right:1px solid rgba(255,255,255,.06)}
+    .side h3{font-size:14px;margin-bottom:18px}
+    .side div{padding:10px 12px;border-radius:9px;color:#8992aa;font-size:13px;margin-bottom:4px}
+    .side .active{background:rgba(88,101,242,.17);color:#fff}
+    .content{padding:28px}
+    .content h2{font-size:25px;margin-bottom:8px}
+    .content p{color:#8f98b0;margin-bottom:22px}
+    .chips{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .chip{padding:17px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:#111628}
+    .chip b{display:block;margin-bottom:4px}.chip span{font-size:12px;color:#7f89a3}
+    section{width:min(1120px,92%);margin:0 auto 120px}
+    .sectionhead{text-align:center;margin-bottom:35px}
+    .sectionhead small{color:#7f8cff;font-weight:800}.sectionhead h2{font-size:38px;margin-top:7px}
+    .sectionhead p{color:#858fa8;margin-top:8px}
+    .features{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+    .card{
+      padding:25px;border-radius:20px;background:rgba(15,19,32,.72);
+      border:1px solid rgba(255,255,255,.08);transition:.2s
+    }
+    .card:hover{transform:translateY(-4px);border-color:rgba(111,126,255,.35)}
+    .icon{font-size:25px;margin-bottom:18px}.card h3{font-size:17px}.card p{font-size:13px;color:#858fa8;margin-top:7px}
+    .cta{
+      text-align:center;padding:58px 25px;border-radius:28px;
+      background:linear-gradient(135deg,rgba(88,101,242,.2),rgba(139,92,246,.12));
+      border:1px solid rgba(120,133,255,.25)
+    }
+    .cta h2{font-size:38px}.cta p{color:#9aa4be;margin:8px 0 25px}
+    footer{border-top:1px solid rgba(255,255,255,.07);padding:30px 5%;color:#69738c;font-size:13px;text-align:center}
+    @media(max-width:800px){
+      .navlinks{display:none}.features{grid-template-columns:1fr 1fr}.chips{grid-template-columns:1fr}
+      .mock{grid-template-columns:1fr}.side{display:none}.hero{margin-top:75px}
+    }
+    @media(max-width:500px){.features{grid-template-columns:1fr}.panel{padding:18px}h1{font-size:60px}}
+  </style>
+</head>
+<body>
+  <div class="bg"></div><div class="orb one"></div><div class="orb two"></div>
+
+  <nav>
+    <a class="brand" href="#">
+      <span class="logo">ㅎ</span><span>한결봇</span>
+    </a>
+    <div class="navlinks">
+      <a href="#features">기능</a>
+      <a href="#about">소개</a>
+    </div>
+    <a class="navbtn" href="#invite">초대하기</a>
+  </nav>
+
+  <main>
+    <div class="hero">
+      <span class="badge">DISCORD SERVER MANAGEMENT</span>
+      <h1><span class="gradient">한결봇</span></h1>
+      <p>복잡한 설정 없이, 필요한 서버 관리 기능을 한곳에서.<br>깔끔하고 편리하게 Discord 서버를 관리하세요.</p>
+      <div class="actions">
+        <a class="btn primary" href="#invite">✦ 한결봇 서버에 추가하기</a>
+        <a class="btn secondary" href="#features">기능 알아보기 →</a>
+      </div>
+    </div>
+
+    <div class="panel" id="about">
+      <div class="paneltop"><i class="dot"></i><span>한결봇 관리 기능</span></div>
+      <div class="mock">
+        <aside class="side">
+          <h3>한결봇</h3>
+          <div class="active">⌁ 관리</div>
+          <div>⚠ 경고</div>
+          <div>◷ 타임아웃</div>
+          <div>▣ 처벌 로그</div>
+        </aside>
+        <div class="content">
+          <h2>서버 관리를 더 간편하게.</h2>
+          <p>자주 사용하는 관리 기능을 빠르고 깔끔하게 사용할 수 있습니다.</p>
+          <div class="chips">
+            <div class="chip"><b>⚠ 경고 관리</b><span>경고 기록 조회 및 관리</span></div>
+            <div class="chip"><b>◷ 타임아웃</b><span>간편한 제재 처리</span></div>
+            <div class="chip"><b>▣ 처벌 로그</b><span>관리 기록 확인</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section id="features">
+      <div class="sectionhead">
+        <small>FEATURES</small>
+        <h2>필요한 기능만 깔끔하게</h2>
+        <p>한결봇으로 서버 관리에 필요한 작업을 간단하게 처리하세요.</p>
+      </div>
+      <div class="features">
+        <div class="card"><div class="icon">⚠️</div><h3>경고 관리</h3><p>서버 멤버의 경고를 기록하고 조회하세요.</p></div>
+        <div class="card"><div class="icon">⏱️</div><h3>타임아웃</h3><p>필요한 순간 빠르게 타임아웃을 적용하세요.</p></div>
+        <div class="card"><div class="icon">📋</div><h3>처벌 로그</h3><p>처벌 기록을 한곳에서 확인할 수 있습니다.</p></div>
+        <div class="card"><div class="icon">⚙️</div><h3>서버 관리</h3><p>서버 운영에 필요한 관리 기능을 제공합니다.</p></div>
+      </div>
+    </section>
+
+    <section id="invite">
+      <div class="cta">
+        <h2>지금 한결봇을 만나보세요.</h2>
+        <p>간편한 서버 관리를 시작해보세요.</p>
+        <!-- 아래 링크의 BOT_CLIENT_ID를 네 봇의 애플리케이션 ID로 바꾸면 됩니다. -->
+        <a class="btn primary" href="https://discord.com/oauth2/authorize?client_id=BOT_CLIENT_ID&permissions=8&scope=bot%20applications.commands" target="_blank" rel="noopener">
+          ✦ Discord 서버에 한결봇 추가
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer>© 2026 한결봇 · Discord 서버 관리 봇</footer>
+</body>
+</html>
